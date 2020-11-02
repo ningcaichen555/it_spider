@@ -9,7 +9,7 @@ class It610SpiderSpider(CrawlSpider):
     start_urls = ['https://www.it610.com/']
 
     rules = (
-        Rule(LinkExtractor(allow=()), callback='parse_item', follow=True),
+        Rule(LinkExtractor(allow=(r'https://www.it610.com/search/.*/1.htm')), callback='parse_item', follow=True),
     )
 
     def parse_item(self, response):
