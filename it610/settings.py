@@ -32,18 +32,11 @@ UA_LIST = ['Mozilla/5.0 (compatible; U; ABrowse 0.6; Syllable) AppleWebKit/420+ 
 
 USER_AGENT = random.choice(UA_LIST)
 
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'it610 (+http://www.yourdomain.com)'
-
-# Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 32
 
-# Configure a delay for requests for the same website (default: 0)
-# See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
-# See also autothrottle settings and docs
 #DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
@@ -105,3 +98,55 @@ ROBOTSTXT_OBEY = False
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+IPPOOL = [
+    "112.80.255.77:80",
+    "112.80.255.51:80",
+    "112.80.255.29:80",
+    "112.80.248.95:80",
+    "218.66.253.144:80",
+    "112.80.248.75:80",
+    "112.80.248.73:80",
+    "112.80.248.18:80",
+    "111.206.37.248:80",
+    "111.206.37.68:80",
+    "111.206.37.244:80",
+    "111.206.37.161:80",
+    "111.206.37.100:80",
+    "111.13.100.91:80",
+    "165.225.32.114:10223",
+    "88.198.24.108:3128",
+    "96.114.249.38:3128",
+    "213.173.33.102:80",
+    "165.225.32.117:10356",
+    "3.211.17.212:80",
+    "167.99.145.189:3128",
+    "165.225.32.113:10223",
+    "69.252.50.230:3128",
+    "102.129.249.120:3128",
+    "159.203.61.169:3128",
+    "165.225.32.109:10223",
+    "46.4.96.137:3128",
+    "165.225.32.106:10223",
+    "165.225.32.107:13084",
+    "102.129.249.120:8080",
+    "61.135.186.243:80",
+    "61.135.186.80:80",
+    "218.66.253.146:8800",
+    "165.225.32.116:10223",
+    "61.135.185.176:80",
+    "61.135.185.20:80",
+    "61.135.185.90:80",
+    "191.96.42.80:3128",
+    "61.135.185.38:80",
+    "61.135.185.69:80",
+    "61.135.185.31:80",
+    "61.135.185.68:80",
+    "61.135.185.78:80",
+    "61.135.185.92:80",
+    "61.135.186.222:80",
+    "61.135.185.160:80",
+    "61.135.185.152:80",
+    "61.135.185.153:80",
+    "61.135.185.118:80",
+    "61.135.185.172:80"
+]
