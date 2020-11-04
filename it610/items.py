@@ -7,7 +7,7 @@ import hashlib
 
 import scrapy
 from itemloaders import ItemLoader
-from itemloaders.processors import MapCompose
+from itemloaders.processors import MapCompose, Identity
 from scrapy.loader.processors import TakeFirst
 
 
@@ -75,4 +75,26 @@ class ItSpiderItem(scrapy.Item):
     # 喜欢数
     like_count = scrapy.Field()
     # 文章标签
-    subjects = scrapy.Field()
+    subject = scrapy.Field()
+
+
+class ImageItemLoader(ItemLoader):
+    default_output_processor = TakeFirst()
+
+
+class ImageItems(scrapy.Item):
+    image_urls = scrapy.Field(
+        output_processor=Identity()
+    )
+    origin_image = scrapy.Field(
+        output_processor=Identity()
+    )
+    header = scrapy.Field()
+    publish_date = scrapy.Field(
+        input_processor=MapCompose(date_convert)
+    )
+    image_id = scrapy.Field()
+    # 文章内容
+    content = scrapy.Field()
+    # 文章id
+    article_id = scrapy.Field()
