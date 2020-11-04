@@ -5,14 +5,11 @@
 
 
 # useful for handling different item types with a single interface
-import os
 import re
 
-from itemadapter import ItemAdapter
 from requests import Request
 from scrapy.exceptions import DropItem
 from scrapy.pipelines.images import ImagesPipeline
-
 from it610.image.ImageUp import ImageUp
 from it610.items import ItSpiderItem, ImageItems, ImageItemLoader
 
@@ -23,7 +20,7 @@ class UploadImagePipeline:
         self.imageUp = ImageUp()
 
     def process_item(self, item, spider):
-        print(item)
+        # print(item)
         # imagePath = item["image_urls"][index]
         # realImagePath = item["origin_image"][index]
         # realImagePath = realImagePath.replace("https:", "")
@@ -40,29 +37,34 @@ class UploadImagePipeline:
 
 
 class SaveImagePipeline(ImagesPipeline):
+    it_spider_item = None
+
     default_headers = {
         'referer': '',
     }
 
     def process_item(self, item, spider):
+        it_spider_item = item
         content = item['content']
         imageRes = re.findall(r'\"(https://img.it610.com/image.*?)\"', content)
         if imageRes:
             imageItemLoader = ImageItemLoader(item=ImageItems())
             imageItemLoader.add_value("image_urls", imageRes)
-            imageItemLoader.add_value("header", item["origin_url"])
+            imageItemLoader.add_value("referer", item["origin_url"])
             imageItemLoader.add_value("article_id", item["article_id"])
-            image_items = imageItemLoader.load_item()
-            self.get_media_requests(image_items)
+            image_item = imageItemLoader.load_item()
+            it_spider_item["imageItem"] = image_item
+            self.get_media_requests(it_spider_item, self.spiderinfo)
         else:
             return item
 
     def get_media_requests(self, item, info):
+        imageItem = item["imageItem"]
         # 下载图片，如果传过来的是集合需要循环下载
         # meta里面的数据是从spider获取，然后通过meta传递给下面方法：file_path
-        if isinstance(item, ItSpiderItem) and item.get('image_urls'):
-            self.default_headers['referer'] = item["name"]
-            for url in item['image_urls']:
+        if isinstance(imageItem, ItSpiderItem) and imageItem.get('image_urls'):
+            self.default_headers['referer'] = imageItem["referer"]
+            for url in imageItem['image_urls']:
                 yield Request(url=url, headers=self.default_headers)
 
     def item_completed(self, results, item, info):
@@ -80,5 +82,5 @@ class SaveImagePipeline(ImagesPipeline):
         return item
 
     def file_path(self, request, response=None, info=None):
-        filePath = u'%s/%s.jpg' % (request.meta['publish_date'],request)
+        filePath = u'%s/%s.jpg' % (request.meta['publish_date'], request)
         return filePath

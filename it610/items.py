@@ -76,6 +76,8 @@ class ItSpiderItem(scrapy.Item):
     like_count = scrapy.Field()
     # 文章标签
     subject = scrapy.Field()
+    #图片实例
+    imageItem = scrapy.Field()
 
 
 class ImageItemLoader(ItemLoader):
@@ -89,7 +91,7 @@ class ImageItems(scrapy.Item):
     origin_image = scrapy.Field(
         output_processor=Identity()
     )
-    header = scrapy.Field()
+    referer = scrapy.Field()
     publish_date = scrapy.Field(
         input_processor=MapCompose(date_convert)
     )
