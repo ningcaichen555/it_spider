@@ -7,7 +7,7 @@
 # useful for handling different item types with a single interface
 import re
 
-from requests import Request
+import scrapy
 from scrapy.exceptions import DropItem
 from scrapy.pipelines.images import ImagesPipeline
 from it610.image.ImageUp import ImageUp
@@ -41,10 +41,10 @@ class SaveImagePipeline(ImagesPipeline):
 
     default_headers = {
         'referer': '',
+        'Connection': 'close'
     }
 
-    def process_item(self, item, spider):
-        it_spider_item = item
+    def get_media_requests(self, item, info):
         content = item['content']
         imageRes = re.findall(r'\"(https://img.it610.com/image.*?)\"', content)
         if imageRes:
@@ -52,20 +52,17 @@ class SaveImagePipeline(ImagesPipeline):
             imageItemLoader.add_value("image_urls", imageRes)
             imageItemLoader.add_value("referer", item["origin_url"])
             imageItemLoader.add_value("article_id", item["article_id"])
-            image_item = imageItemLoader.load_item()
-            it_spider_item["imageItem"] = image_item
-            self.get_media_requests(it_spider_item, self.spiderinfo)
+            item["imageItem"] = imageItemLoader.load_item()
         else:
             return item
-
-    def get_media_requests(self, item, info):
-        imageItem = item["imageItem"]
+        image_item = item["imageItem"]
         # 下载图片，如果传过来的是集合需要循环下载
         # meta里面的数据是从spider获取，然后通过meta传递给下面方法：file_path
-        if isinstance(imageItem, ItSpiderItem) and imageItem.get('image_urls'):
-            self.default_headers['referer'] = imageItem["referer"]
-            for url in imageItem['image_urls']:
-                yield Request(url=url, headers=self.default_headers)
+        if isinstance(item, ItSpiderItem) and image_item.get('image_urls'):
+            self.default_headers['referer'] = image_item["referer"]
+            for url in image_item['image_urls']:
+                print(url)
+                yield scrapy.Request(url=url, headers=self.default_headers)
 
     def item_completed(self, results, item, info):
         '''所有图片处理完毕后（不管下载成功或失败），会调用item_completed进行处理
