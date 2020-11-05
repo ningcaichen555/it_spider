@@ -5,13 +5,14 @@
 
 
 # useful for handling different item types with a single interface
+import os
 import re
 
 import scrapy
 from scrapy.exceptions import DropItem
 from scrapy.pipelines.images import ImagesPipeline
 from it610.image.ImageUp import ImageUp
-from it610.items import ItSpiderItem, ImageItems, ImageItemLoader
+from it610.items import ItSpiderItem, ImageItems, ImageItemLoader, md5_convert
 
 
 class UploadImagePipeline:
@@ -20,7 +21,7 @@ class UploadImagePipeline:
         self.imageUp = ImageUp()
 
     def process_item(self, item, spider):
-        # print(item)
+        print(item)
         # imagePath = item["image_urls"][index]
         # realImagePath = item["origin_image"][index]
         # realImagePath = realImagePath.replace("https:", "")
@@ -41,7 +42,8 @@ class SaveImagePipeline(ImagesPipeline):
 
     default_headers = {
         'referer': '',
-        'Connection': 'close'
+        'Connection': 'close',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.116 Safari/537.36'
     }
 
     def get_media_requests(self, item, info):
@@ -79,5 +81,7 @@ class SaveImagePipeline(ImagesPipeline):
         return item
 
     def file_path(self, request, response=None, info=None):
-        filePath = u'%s/%s.jpg' % (request.meta['publish_date'], request)
+        # path, temp = os.path.split(request.url)
+        # file_name, extension = os.path.splitext(temp)
+        filePath = u'%s.jpg' % (md5_convert(request.url))
         return filePath

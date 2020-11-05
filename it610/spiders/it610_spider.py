@@ -8,7 +8,7 @@ from it610.items import ArticleItemLoader, ItSpiderItem
 
 class It610SpiderSpider(CrawlSpider):
     name = 'it610_spider'
-    allowed_domains = ['www.it610.com']
+    allowed_domains = ['www.it610.com', 'img.it610.com']
     start_urls = ['https://www.it610.com/']
 
     def __init__(self, *a, **kw):
