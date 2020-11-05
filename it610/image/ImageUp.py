@@ -1,3 +1,5 @@
+import os
+
 from qiniu import Auth, put_file, etag
 
 

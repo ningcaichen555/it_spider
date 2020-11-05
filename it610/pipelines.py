@@ -15,6 +15,7 @@ from it610.image.ImageUp import ImageUp
 from it610.items import ItSpiderItem, ImageItems, ImageItemLoader, md5_convert
 
 
+# 上传本地图片
 class UploadImagePipeline:
     # 创建初始化函数，当通过此类创建对象时首先被调用的方法
     def __init__(self):
@@ -22,24 +23,27 @@ class UploadImagePipeline:
 
     def process_item(self, item, spider):
         print(item)
-        # imagePath = item["image_urls"][index]
-        # realImagePath = item["origin_image"][index]
-        # realImagePath = realImagePath.replace("https:", "")
-        # key = os.path.basename(imagePath)
-        # ret, info = self.imageUp.upload(key, "../images/" + imagePath)
-        # newImagePath = ret["key"]
-        # content = content.replace(realImagePath, newImagePath)
-        # item['content'] = content
-        return item
+        if item["imageItem"]:
+            imageItem = item["imageItem"]
+            for url in imageItem["image_urls"]:
+                key = os.path.basename(url)
+                # 上传之后地址
+                ret, info = self.imageUp.upload(key, "./images/" + url)
+                realImageUrl = "https://img.zhifoubj.com/" + key
+                origin_url = imageItem["origin_image_map"][key]
+                content = item.get("content")
+                item["content"] = content.replace(origin_url, realImageUrl)
+            return item
+        else:
+            return item
 
     def handle_error(self, failure, item):
-        print('============================', failure, item)
+        print('it_spider_handle_error', failure, item)
         return item
 
 
+# 保存本地图片
 class SaveImagePipeline(ImagesPipeline):
-    it_spider_item = None
-
     default_headers = {
         'referer': '',
         'Connection': 'close',
@@ -49,9 +53,14 @@ class SaveImagePipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
         content = item['content']
         imageRes = re.findall(r'\"(https://img.it610.com/image.*?)\"', content)
+        origin_image_map = {}
+        for origin in imageRes:
+            filePath = u'%s.jpg' % (md5_convert(origin))
+            origin_image_map[filePath] = origin
         if imageRes:
             imageItemLoader = ImageItemLoader(item=ImageItems())
-            imageItemLoader.add_value("image_urls", imageRes)
+            imageItemLoader.add_value("image_urls", list(set(imageRes)))
+            imageItemLoader.add_value("origin_image_map", origin_image_map)
             imageItemLoader.add_value("referer", item["origin_url"])
             imageItemLoader.add_value("article_id", item["article_id"])
             item["imageItem"] = imageItemLoader.load_item()
@@ -63,7 +72,6 @@ class SaveImagePipeline(ImagesPipeline):
         if isinstance(item, ItSpiderItem) and image_item.get('image_urls'):
             self.default_headers['referer'] = image_item["referer"]
             for url in image_item['image_urls']:
-                print(url)
                 yield scrapy.Request(url=url, headers=self.default_headers)
 
     def item_completed(self, results, item, info):
@@ -77,11 +85,11 @@ class SaveImagePipeline(ImagesPipeline):
         image_path = [x['path'] for ok, x in results if ok]
         if not image_path:
             raise DropItem('Item contains no images')
-        item['image_urls'] = image_path
+        image_item = item.get("imageItem")
+        if image_item:
+            image_item['image_urls'] = image_path
         return item
 
     def file_path(self, request, response=None, info=None):
-        # path, temp = os.path.split(request.url)
-        # file_name, extension = os.path.splitext(temp)
         filePath = u'%s.jpg' % (md5_convert(request.url))
         return filePath

@@ -88,8 +88,8 @@ class ImageItems(scrapy.Item):
     image_urls = scrapy.Field(
         output_processor=Identity()
     )
-    origin_image = scrapy.Field(
-        output_processor=Identity()
+    origin_image_map = scrapy.Field(
+
     )
     referer = scrapy.Field()
     publish_date = scrapy.Field(
