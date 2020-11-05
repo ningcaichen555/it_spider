@@ -41,7 +41,12 @@ class It610SpiderSpider(CrawlSpider):
         links = linkExt.extract_links(response)
         if links:
             for link in links:
+                url = link.url.replace("https://www.it610.com", "")
+                # xpath_str = '//div[@class="article-excerpt"]/..[contains(@href,"%s")]/div[@class="article-excerpt"]/text()' % url
+                xpath_str = '//a[contains(@href,"%s")]/div[@class="article-excerpt"]/*' % url
+                article_summary = response.xpath(xpath_str).getall()
                 request = Request(str(link.url), callback=self.parse_article,
+                                  meta={"article_summary": "".join(article_summary)},
                                   headers={'Connection': 'close', 'refer': str(response.url)})
                 yield request
 
