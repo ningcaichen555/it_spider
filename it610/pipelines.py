@@ -11,8 +11,55 @@ import re
 import scrapy
 from scrapy.exceptions import DropItem
 from scrapy.pipelines.images import ImagesPipeline
+from twisted.enterprise import adbapi
+from pymysql import cursors
 from it610.image.ImageUp import ImageUp
 from it610.items import ItSpiderItem, ImageItems, ImageItemLoader, md5_convert
+from it610.settings import MY_SETTINGS
+
+INSERT_SQL = """INSERT INTO article ( title, author, pub_time, origin_url, article_id, content, word_count, view_count, comment_count, like_count, subjects ) 
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s )"""
+
+
+# 上传到mysql
+class ItspiderPipeline:
+    # 创建初始化函数，当通过此类创建对象时首先被调用的方法
+    def __init__(self, dbpool):
+        self.dbpool = dbpool
+
+    @classmethod
+    def from_settings(cls, settings):
+        settings = MY_SETTINGS
+        settings['cursorclass'] = cursors.DictCursor
+        dbpool = adbapi.ConnectionPool("pymysql", **settings)
+        return cls(dbpool)
+
+    def process_item(self, item, spider):
+        query = self.dbpool.runInteraction(self.db_insert, item)
+        query.addErrback(self.handle_error, item)
+        return item
+
+    def handle_error(self, failure, item):
+        print('it_spider_handle_sql_error', failure, item)
+
+    def db_insert(self, cursor, item):
+        tt = cursor._connection._connection
+        try:
+            tt.ping()
+        except Exception as e:
+            print('it_spider_handle_sql_exception', e)
+            self.dbpool.close()
+            settings = MY_SETTINGS
+            settings['cursorclass'] = cursors.DictCursor
+            self.dbpool = adbapi.ConnectionPool("pymysql", **settings)
+
+        print("添加数据成功")
+        cursor.execute(
+            INSERT_SQL,
+            (item['title'], item['author'], item['pub_time'], item['origin_url'], item['article_id'],
+             item['content'], item['word_count'], item['view_count'], item['comment_count'],
+             item['like_count'], item['subjects']))
+        return item
 
 
 # 上传本地图片
@@ -22,7 +69,6 @@ class UploadImagePipeline:
         self.imageUp = ImageUp()
 
     def process_item(self, item, spider):
-        print(item)
         if item["imageItem"]:
             imageItem = item["imageItem"]
             for url in imageItem["image_urls"]:

@@ -38,6 +38,17 @@ ROBOTSTXT_OBEY = False
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 32
 
+# settings.py文件下添加mysql的配置信息
+MY_SETTINGS = {
+    "host": "39.97.186.184",
+    "user": "webset_online",
+    "passwd": "sswz2020",
+    "db": "webset_online",
+    "port": 3306,
+    "charset": "utf8mb4",
+    'use_unicode': True,
+}
+
 # DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16
