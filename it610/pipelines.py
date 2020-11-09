@@ -17,12 +17,12 @@ from it610.image.ImageUp import ImageUp
 from it610.items import ItSpiderItem, ImageItems, ImageItemLoader, md5_convert
 from it610.settings import MY_SETTINGS
 
-INSERT_SQL = """INSERT INTO article ( title, author, pub_time, origin_url, article_id, content, word_count, view_count, comment_count, like_count, subjects ) 
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s )"""
+INSERT_SQL = """INSERT INTO article ( title, author, pub_time, origin_url, article_id, content,article_desc, word_count, view_count, comment_count, like_count, subjects ) 
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s )"""
 
 
 # 上传到mysql
-class ItspiderPipeline:
+class ItSpiderPipeline:
     # 创建初始化函数，当通过此类创建对象时首先被调用的方法
     def __init__(self, dbpool):
         self.dbpool = dbpool
@@ -57,8 +57,8 @@ class ItspiderPipeline:
         cursor.execute(
             INSERT_SQL,
             (item['title'], item['author'], item['pub_time'], item['origin_url'], item['article_id'],
-             item['content'], item['word_count'], item['view_count'], item['comment_count'],
-             item['like_count'], item['subjects']))
+             item['content'], item['article_summary'], 0, 0, 0,
+             0, item['subject']))
         return item
 
 

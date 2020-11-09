@@ -66,6 +66,8 @@ class ItSpiderItem(scrapy.Item):
     )
     # 文章内容
     content = scrapy.Field()
+    # 文章摘要
+    article_summary = scrapy.Field()
     # 文章字数
     word_count = scrapy.Field()
     # 浏览量
@@ -76,7 +78,7 @@ class ItSpiderItem(scrapy.Item):
     like_count = scrapy.Field()
     # 文章标签
     subject = scrapy.Field()
-    #图片实例
+    # 图片实例
     imageItem = scrapy.Field()
 
 

@@ -91,6 +91,7 @@ IMAGES_STORE = os.path.join(os.path.dirname(__file__), 'images')
 ITEM_PIPELINES = {
     'it610.pipelines.SaveImagePipeline': 1,
     'it610.pipelines.UploadImagePipeline': 2,
+    'it610.pipelines.ItSpiderPipeline': 3,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

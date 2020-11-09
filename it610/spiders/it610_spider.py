@@ -52,6 +52,9 @@ class It610SpiderSpider(CrawlSpider):
 
     def parse_article(self, response):
         article_itemLoader = ArticleItemLoader(item=ItSpiderItem(), response=response)
+        article_summary = response.get("meta")["article_summary"]
+        if article_summary:
+            article_itemLoader.add_value("article_summary", article_summary)
         public_title = response.xpath('//div/h1[@id="articleTitle"]/text()').get()
         if public_title:
             article_itemLoader.add_value("title", public_title)
