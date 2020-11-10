@@ -3,9 +3,10 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 import random
+import time
 
 from scrapy import signals
-
+from .settings import IPPOOL
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
 
@@ -103,35 +104,21 @@ class It610DownloaderMiddleware:
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
 
-#代理ip
-class MyproxiesSpiderMiddleware(object):
+
+# 代理ip
+class MyProxiesSpiderMiddleware(object):
     def __init__(self, ip=''):
         self.ip = ip
 
     def process_request(self, request, spider):
-        thisip = random.choice(IPPOOL)
-        print("this is ip:" + thisip)
-        request.meta["proxy"] = "http://" + thisip
+        proxy = random.choice(IPPOOL)
+        request.meta["http_proxy"] = "http://" + proxy
 
     def process_response(self, request, response, spider):
-        '''对返回的response处理'''
         # 如果返回的response状态不是200，重新生成当前request对象
         if response.status != 200:
-            proxy = self.get_random_proxy()
+            proxy = random.choice(IPPOOL)
             print("this is response ip:" + proxy)
-            # 对当前reque加上代理
-            request.meta['proxy'] = proxy
+            request.meta['http_proxy'] = proxy
             return request
         return response
-
-    def get_random_proxy(self):
-        '''随机从文件中读取proxy'''
-        while 1:
-            with open('你保存的\proxies.txt', 'r') as f:
-                proxies = f.readlines()
-            if proxies:
-                break
-            else:
-                time.sleep(1)
-        proxy = random.choice(proxies).strip()
-        return proxy
