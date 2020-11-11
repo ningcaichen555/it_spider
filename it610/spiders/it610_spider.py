@@ -1,3 +1,4 @@
+from faker import Faker
 from scrapy import Request
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
@@ -10,6 +11,7 @@ class It610SpiderSpider(CrawlSpider):
     name = 'it610_spider'
     allowed_domains = ['www.it610.com', 'img.it610.com']
     start_urls = ['https://www.it610.com/']
+    faker = Faker(locale='zh_CN')
 
     def __init__(self, *a, **kw):
         super().__init__(*a, **kw)
@@ -56,7 +58,7 @@ class It610SpiderSpider(CrawlSpider):
         if article_summary:
             article_itemLoader.add_value("article_summary", article_summary)
         else:
-            article_itemLoader.add_value("article_summary", '')
+            article_itemLoader.add_value("article_summary", 'article_summary')
 
         public_title = response.xpath('//div/h1[@id="articleTitle"]/text()').get()
         if public_title:
@@ -67,13 +69,14 @@ class It610SpiderSpider(CrawlSpider):
         if public_anthor:
             article_itemLoader.add_value("author", public_anthor)
         else:
-            article_itemLoader.add_value("author", "")
+            randomName = self.faker.name()
+            article_itemLoader.add_value("author", randomName)
 
         public_time = response.xpath('//div[@class="article__authorright"]//span/text()').get()
         if public_time:
             article_itemLoader.add_value("pub_time", public_time)
         else:
-            article_itemLoader.add_value("pub_time", '')
+            article_itemLoader.add_value("pub_time", "")
 
         article_itemLoader.add_value("origin_url", response.url)
         article_itemLoader.add_value("article_id", response.url)
