@@ -118,7 +118,7 @@ ITEM_PIPELINES = {
     'it610.pipelines.UploadImagePipeline': 2,
     'it610.pipelines.ItSpiderPipeline': 3,
 }
-
+LOG_LEVEL = 'INFO'
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
 # AUTOTHROTTLE_ENABLED = True

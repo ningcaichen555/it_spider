@@ -52,26 +52,41 @@ class It610SpiderSpider(CrawlSpider):
 
     def parse_article(self, response):
         article_itemLoader = ArticleItemLoader(item=ItSpiderItem(), response=response)
-        article_summary = response.get("meta")["article_summary"]
+        article_summary = response.meta.get("article_summary")
         if article_summary:
             article_itemLoader.add_value("article_summary", article_summary)
+        else:
+            article_itemLoader.add_value("article_summary", '')
+
         public_title = response.xpath('//div/h1[@id="articleTitle"]/text()').get()
         if public_title:
             article_itemLoader.add_value("title", public_title)
+
         public_anthor = response.xpath(
             '//div[@class="article__authorright"]/div[@class="article__authormeta"]/a/strong/text()').get()
-        article_itemLoader.add_value("author", public_anthor)
+        if public_anthor:
+            article_itemLoader.add_value("author", public_anthor)
+        else:
+            article_itemLoader.add_value("author", "")
+
         public_time = response.xpath('//div[@class="article__authorright"]//span/text()').get()
-        article_itemLoader.add_value("pub_time", public_time)
+        if public_time:
+            article_itemLoader.add_value("pub_time", public_time)
+        else:
+            article_itemLoader.add_value("pub_time", '')
+
         article_itemLoader.add_value("origin_url", response.url)
         article_itemLoader.add_value("article_id", response.url)
+
         public_content = response.xpath('//div[@class="markdown_views"]/div[@id="article_content"]').get()
         if public_content:
             article_itemLoader.add_value("content", public_content)
+
         public_subject = response.xpath('//ul[contains(@class,"taglist--inline")]/li/a[@class="tag"]/text()').get()
         if public_subject:
             article_itemLoader.add_value("subject", public_subject.strip())
         else:
             article_itemLoader.add_value("subject", 0)
+
         item = article_itemLoader.load_item()
         yield item

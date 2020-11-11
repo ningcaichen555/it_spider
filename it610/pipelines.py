@@ -52,13 +52,12 @@ class ItSpiderPipeline:
             settings = MY_SETTINGS
             settings['cursorclass'] = cursors.DictCursor
             self.dbpool = adbapi.ConnectionPool("pymysql", **settings)
-
-        print("添加数据成功")
         cursor.execute(
             INSERT_SQL,
             (item['title'], item['author'], item['pub_time'], item['origin_url'], item['article_id'],
              item['content'], item['article_summary'], 0, 0, 0,
              0, item['subject']))
+        print("=====title=====" + item['title'] + "=====origin_url=====" + item['origin_url'])
         return item
 
 
@@ -69,7 +68,7 @@ class UploadImagePipeline:
         self.imageUp = ImageUp()
 
     def process_item(self, item, spider):
-        if item["imageItem"]:
+        if item.get("imageItem"):
             imageItem = item["imageItem"]
             for url in imageItem["image_urls"]:
                 key = os.path.basename(url)
@@ -129,8 +128,8 @@ class SaveImagePipeline(ImagesPipeline):
                success表示图片是否下载成功；image_info_or_failure是一个字典
         '''
         image_path = [x['path'] for ok, x in results if ok]
-        if not image_path:
-            raise DropItem('Item contains no images')
+        # if not image_path:
+        #     raise DropItem('Item contains no images')
         image_item = item.get("imageItem")
         if image_item:
             image_item['image_urls'] = image_path
