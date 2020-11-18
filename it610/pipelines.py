@@ -74,6 +74,8 @@ class UploadImagePipeline:
                 key = os.path.basename(url)
                 # 上传之后地址
                 ret, info = self.imageUp.upload(key, "./images/" + url)
+                if os.path.exists("./images/" + url):
+                    os.remove("./images/" + url)
                 realImageUrl = "https://img.zhifoubj.com/" + key
                 origin_url = imageItem["origin_image_map"][key]
                 content = item.get("content")
