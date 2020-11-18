@@ -74,6 +74,15 @@ MY_SETTINGS = {
     'use_unicode': True,
 }
 
+
+# ############ 连接redis 信息 #################
+REDIS_URL = 'redis://root:sswz2020@39.97.186.184:6379'       # 连接URL（优先于以上配置）
+REDIS_PARAMS  = {}                                  # Redis连接参数             默认：REDIS_PARAMS = {'socket_timeout': 30,'socket_connect_timeout': 30,'retry_on_timeout': True,'encoding': REDIS_ENCODING,}）
+# REDIS_PARAMS['redis_cls'] = 'myproject.RedisClient' # 指定连接Redis的Python模块  默认：redis.StrictRedis
+REDIS_ENCODING = "utf-8"
+# 自定义去重规则
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
 # DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 16

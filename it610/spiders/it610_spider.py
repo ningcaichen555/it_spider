@@ -5,9 +5,10 @@ from scrapy.spiders import CrawlSpider, Rule
 
 from it610.image.ImageUp import ImageUp
 from it610.items import ArticleItemLoader, ItSpiderItem
+from scrapy_redis.spiders import RedisSpider
 
 
-class It610SpiderSpider(CrawlSpider):
+class It610SpiderSpider(RedisSpider):
     name = 'it610_spider'
     allowed_domains = ['www.it610.com', 'img.it610.com']
     start_urls = ['https://www.it610.com/']
