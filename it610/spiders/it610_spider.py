@@ -23,23 +23,38 @@ class It610SpiderSpider(RedisSpider):
              follow=True),
     )
 
+    def start_requests(self):
+        for url in self.start_urls:
+            yield self.make_requests_from_url(url)
+
+    def make_requests_from_url(self, url):
+        return Request(url=str("https://www.it610.com/"), callback=self.parse_tags, dont_filter=True, )
+
     def parse_tags(self, response):
+        linkExt = LinkExtractor(allow=r'https://www.it610.com/tags/[a-zA-Z0-9]/1.htm')
+        links = linkExt.extract_links(response)
+        if links:
+            for link in links:
+                request = Request(str(link.url), callback=self.parse_search, dont_filter=True,
+                                  headers={'Connection': 'close', 'refer': str(response.url)})
+                yield request
+
+    def parse_search(self, response):
         linkExt = LinkExtractor(allow=r'https://www.it610.com/search/.*/1.htm')
         links = linkExt.extract_links(response)
         if links:
             for link in links:
-                request = Request(str(link.url), callback=self.parse_search,
+                request = Request(str(link.url), callback=self.parse_article, dont_filter=True,
                                   headers={'Connection': 'close', 'refer': str(response.url)})
                 yield request
         next_page_str = response.xpath(
-            '//div[contains(@class,"container")]/div[@class="page_mod"]/span[@class="page_next"]/a/@href').get()
+            '//div[contains(@class,"container") and contains(@class,"mt10")]/div[contains(@class,"page_mod") and contains(@class,"mt15")]/span[@class="page_next"]/a/@href').get()
         if next_page_str:
             next_page = "https://www.it610.com" + next_page_str
-            request = Request(next_page, callback=self.parse_tags,
-                              headers={'Connection': 'close', 'refer': str(response.url)})
-            yield request
+            Request(next_page, callback=self.parse_search,
+                    headers={'Connection': 'close', 'refer': str(response.url)})
 
-    def parse_search(self, response):
+    def parse_article(self, response):
         linkExt = LinkExtractor(allow=r'/article/.*.htm')
         links = linkExt.extract_links(response)
         if links:
@@ -47,12 +62,18 @@ class It610SpiderSpider(RedisSpider):
                 url = link.url.replace("https://www.it610.com", "")
                 xpath_str = '//a[contains(@href,"%s")]/div[@class="article-excerpt"]' % url
                 article_summary = response.xpath(xpath_str).getall()
-                request = Request(str(link.url), callback=self.parse_article,
+                request = Request(str(link.url), callback=self.parse_article_detail,
                                   meta={"article_summary": "".join(article_summary)},
                                   headers={'Connection': 'close', 'refer': str(response.url)})
                 yield request
+        next_page_str = response.xpath(
+            '//div[contains(@class,"container") and contains(@class,"mt10")]/div[contains(@class,"page_mod") and contains(@class,"mt15")]/span[@class="page_next"]/a/@href').get()
+        if next_page_str:
+            next_page = "https://www.it610.com" + next_page_str
+            Request(next_page, callback=self.parse_article,
+                    headers={'Connection': 'close', 'refer': str(response.url)})
 
-    def parse_article(self, response):
+    def parse_article_detail(self, response):
         article_itemLoader = ArticleItemLoader(item=ItSpiderItem(), response=response)
         article_summary = response.meta.get("article_summary")
         if article_summary:

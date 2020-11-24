@@ -7,8 +7,7 @@ import hashlib
 
 import scrapy
 from itemloaders import ItemLoader
-from itemloaders.processors import MapCompose, Identity
-from scrapy.loader.processors import TakeFirst
+from itemloaders.processors import MapCompose, Identity, TakeFirst
 
 
 # 定义一个时间处理转换函数

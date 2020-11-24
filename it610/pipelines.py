@@ -137,6 +137,6 @@ class SaveImagePipeline(ImagesPipeline):
             image_item['image_urls'] = image_path
         return item
 
-    def file_path(self, request, response=None, info=None):
+    def file_path(self, request, response=None, info=None, item=None):
         filePath = u'%s.jpg' % (md5_convert(request.url))
         return filePath
