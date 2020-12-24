@@ -20,28 +20,29 @@ class It610SpiderSpider(RedisSpider):
         super().__init__(*a, **kw)
         self.imageUp = ImageUp()
 
-    rules = (
-        Rule(LinkExtractor(allow=(r'https://www.it610.com/tags/[a-zA-Z0-9]/1.htm')), callback='parse_tags',
-             follow=True),
-    )
+    # rules = (
+    #     Rule(LinkExtractor(allow=(r'https://www.it610.com/tags/[a-zA-Z0-9]/1.htm')), callback='parse_tags',
+    #          follow=True),
+    # )
 
     def start_requests(self):
         print("当前路径 -> %s" % os.getcwd())
         with open("1.txt", 'rb') as file:
             writelines = file.readlines()
-            for url in writelines:
+            for index, url in enumerate(writelines):
+                print("当前index------>" + str(index))
                 realUrl = url.decode(encoding="utf-8").rstrip("\n")
                 yield self.request_from_url(realUrl)
 
     def request_from_url(self, url):
-        return Request(url=url, callback=self.parse_article, dont_filter=True, )
+        return Request(url=url, callback=self.parse_article_detail, dont_filter=True, )
 
     # def start_requests(self):
     #     for url in self.start_urls:
     #         yield self.make_requests_from_url(url)
 
     def make_requests_from_url(self, url):
-        return Request(url=str("https://www.it610.com/"), callback=self.parse_article_detail, dont_filter=True, )
+        return Request(url=str("https://www.it610.com/"), callback=self.parse_article, dont_filter=True, )
 
     def parse(self, response):
         linkExt = LinkExtractor(allow=r'https://www.it610.com/tags/[a-zA-Z0-9]/1.htm')
