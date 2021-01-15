@@ -13,7 +13,7 @@ itemadapter==0.1.1
 itemloaders==1.0.3
 items==0.6.5
 jmespath==0.10.0
-lxml==4.6.1
+lxml==4.6.2
 nulltype==2.3.1
 parsel==1.6.0
 Pillow==8.0.1
